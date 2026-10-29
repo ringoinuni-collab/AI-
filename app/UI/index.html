@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>My Application</title>
+    <style>
+        body {
+            background: #202124;
+            color: white;
+            font-family: sans-serif;
+            padding: 30px;
+        }
+
+        button {
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #cccccc;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="flex flex-col items-center justify-bottom gap-10 pt-10">
+    <h1 class="text-2xl font-bold">外部操作・AIによる音量自動調整アプリ</h1>
+    <div>
+        <p>音量調整</p>
+        <input type="range" min="0" max="100" value="50" class="slider w-100">
+    </div>
+    <div class="flex justify-center gap-10">
+        <button id="voiceButton" class=""><img src="img/microphone.png" alt="カメラ" width="32" height="32"></button>
+        <button id="cameraButton" class=""><img src="img/camera.png" alt="カメラ" width="32" height="32"></button>
+    </div>
+</body>
+</html>
