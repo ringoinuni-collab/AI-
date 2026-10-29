@@ -5,7 +5,7 @@
     <title>My Application</title>
     <style>
         body {
-            background: #202124;
+            background: #111;
             color: white;
             font-family: sans-serif;
             padding: 30px;
@@ -19,20 +19,33 @@
         }
 
         button:hover {
-            background: #cccccc;
+            background: #333;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script>
+        function setVolume(value) {
+            window.pywebview.api.set_volume(Number(value));
+        }
+
+        function toggleMicrophone() {
+            window.pywebview.api.toggle_microphone();
+        }
+
+        function toggleCamera() {
+            window.pywebview.api.toggle_camera();
+        }
+    </script>
 </head>
 <body class="flex flex-col items-center justify-bottom gap-10 pt-10">
     <h1 class="text-2xl font-bold">外部操作・AIによる音量自動調整アプリ</h1>
     <div>
         <p>音量調整</p>
-        <input type="range" min="0" max="100" value="50" class="slider w-100">
+        <input type="range" min="0" max="100" value="50" onChange="setVolume(this.value)" class="slider w-100">
     </div>
     <div class="flex justify-center gap-10">
-        <button id="voiceButton" class=""><img src="img/microphone.png" alt="カメラ" width="32" height="32"></button>
-        <button id="cameraButton" class=""><img src="img/camera.png" alt="カメラ" width="32" height="32"></button>
+        <button id="voiceButton" onClick="toggleMicrophone()" class=""><img src="img/microphone.png" alt="カメラ" width="32" height="32"></button>
+        <button id="cameraButton" onClick="toggleCamera()" class=""><img src="img/camera.png" alt="カメラ" width="32" height="32"></button>
     </div>
 </body>
 </html>
