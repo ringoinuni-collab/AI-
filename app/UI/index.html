@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>My Application</title>
+    <style>
+        body {
+            background: #111;
+            color: white;
+            font-family: sans-serif;
+            padding: 30px;
+        }
+
+        button {
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #333;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script>
+        function setVolume(value) {
+            window.pywebview.api.set_volume(Number(value));
+        }
+        function toggleMic() {
+            window.pywebview.api.toggle_mic();
+        }
+        function toggleCam() {
+            window.pywebview.api.toggle_cam();
+        }
+
+        function updateVolume(value) {
+            document.getElementById("volumeSlider").value = value;
+        }
+        function updateMic(value) {
+            const micButton = document.getElementById("micButton").children[0];
+            micButton.src = value ? "img/microphone.png" : "img/microphone-off.png";
+        }
+        function updateCamera(value) {
+            const cameraButton = document.getElementById("cameraButton").children[0];
+            cameraButton.src = value ? "img/camera.png" : "img/camera-off.png";
+        }
+        window.addEventListener("pywebviewready", async () => {
+            alert("pywebview is ready");
+            alert(await window.pywebview.api.get_volume());
+            document.getElementById("volumeSlider").value = await window.pywebview.api.get_volume();
+        });
+    </script>
+</head>
+<body class="flex flex-col items-center justify-bottom gap-10 pt-10">
+    <h1 class="text-2xl font-bold">外部操作・AIによる音量自動調整アプリ</h1>
+    <div>
+        <p>音量調整</p>
+        <input id="volumeSlider" type="range" min="0" max="100" onInput="setVolume(this.value)" class="slider w-100">
+    </div>
+    <div class="flex justify-center gap-10">
+        <button id="micButton" onClick="toggleMic()" class=""><img src="img/microphone-off.png" alt="マイク" width="32" height="32"></button>
+        <button id="cameraButton" onClick="toggleCam()" class=""><img src="img/camera-off.png" alt="カメラ" width="32" height="32"></button>
+    </div>
+</body>
+</html>
