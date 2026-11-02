@@ -46,8 +46,6 @@
             cameraButton.src = value ? "img/camera.png" : "img/camera-off.png";
         }
         window.addEventListener("pywebviewready", async () => {
-            alert("pywebview is ready");
-            alert(await window.pywebview.api.get_volume());
             document.getElementById("volumeSlider").value = await window.pywebview.api.get_volume();
         });
     </script>
