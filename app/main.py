@@ -6,6 +6,7 @@ import time
 from UI.schema import App, WebViewWindow
 from UI.boundary import set_device_volume, now_volume
 from core_schema import Core
+from default_controll.volume_controll import VolumeController
 
 # ===============================================
 # このクラスなどの想定使用方法
@@ -20,7 +21,7 @@ from core_schema import Core
 # app.volume = 50 のように代入すればUIも更新される
 # ===============================================
 
-
+# メモ：音量を２つ用意する
 core = Core()
 
 
@@ -29,8 +30,6 @@ def eternal_process(core: Core):
     while core.running:
         print(core.running)
         time.sleep(5)
-
-
 
 app = App(now_volume)
 
@@ -46,7 +45,8 @@ window = WebViewWindow(window)
 app.create_update_funcs(window.update_ui)
 app.set_device_volume = set_device_volume
 
-core.start_tasks(lambda: eternal_process(core))
+volume_controller = VolumeController(app, core)
+core.start_tasks(lambda: eternal_process(core), volume_controller.start_recording)
 
 webview.start()
 
