@@ -3,14 +3,15 @@ import platform
 import threading
 
 class App:
-    def __init__(self, now_volume: int):
+    def __init__(self, now_volume: float):
         self.window: WebViewWindow | None = None
+        self._now_volume = now_volume
         self._volume = now_volume
         self._camera = False
         self._microphone = False
         self._lock = threading.Lock()
 
-    def update_volume(self, value: int) -> None: pass
+    def update_volume(self, value: float) -> None: pass
     def update_camera(self, value: bool) -> None: pass
     def update_mic(self, value: bool) -> None: pass
     def create_update_funcs(self, fn: callable) -> None:
@@ -19,19 +20,18 @@ class App:
         self.update_mic = lambda value: fn("updateMic", value)
     def set_device_volume(self, value: int) -> None: pass
 
-    def get_volume(self) -> int:
+    def get_volume(self) -> float:
         """通信用・現在の音量を取得（0～100）"""
         with self._lock:
             return self._volume
 
-    def set_volume(self, value: int) -> None:
+    def set_volume(self, value: float) -> None:
         """通信用・音量を設定（0～100）"""
         if value < 0 or value > 100:
             raise ValueError("音量は0～100の範囲で指定してください。")
         with self._lock:
             self._volume = value
-        self.update_volume(value)
-        self.set_device_volume(value)
+        self.update_volume(round(value, 2))
 
     def toggle_cam(self) -> None:
         """カメラのオン/オフを切り替え"""
@@ -46,8 +46,20 @@ class App:
         self.update_mic(self._microphone)
 
     @property
-    def volume(self) -> int:
-        """(int)デバイス音量（0～100）"""
+    def now_volume(self) -> float:
+        """
+        (float)実際に流すデバイス音量（0～100）\n
+        すぐに書き換わるので使用は非推奨
+        """
+        return self.get_volume()
+    @now_volume.setter
+    def now_volume(self, value: int) -> None:
+        self.set_volume(value)
+        self.set_device_volume(value)
+
+    @property
+    def volume(self) -> float:
+        """(float)デバイス音量（0～100）"""
         return self.get_volume()
     @volume.setter
     def volume(self, value: int) -> None:
