@@ -2,7 +2,7 @@ import soundcard as sc
 import numpy as np
 import pythoncom
 
-from UI.schema import App
+from UI.boundary import App
 from core_schema import Core
 
 class VolumeController:
@@ -36,7 +36,7 @@ class VolumeController:
                 while self.core.running:
                     # 0.1秒分の音声を取得して音量を変更
                     data = recorder.record(numframes=4800)
-                    self.app.volume = self.adjust_volume(data)
+                    self.app.now_volume = self.adjust_volume(data)
         finally:
             pythoncom.CoUninitialize()
 
@@ -52,4 +52,4 @@ class VolumeController:
         gain = max(0.25, min(4, gain))
 
         # ゲインを適用して音量を調整
-        return alpha * self.app.volume + (1 - alpha) * (self.app.volume * gain)
+        return alpha * self.app.now_volume + (1 - alpha) * (self.app.volume * gain)

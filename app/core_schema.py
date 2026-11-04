@@ -1,4 +1,5 @@
 import threading
+import platform
 
 class Core:
     def __init__(self):
@@ -7,6 +8,8 @@ class Core:
 
         # スレッド管理
         self._threads: list[threading.Thread] = []
+
+        self.os = platform.system()
 
     # バックグラウンド処理の開始
     def start_tasks(self, *tasks: tuple[callable]):

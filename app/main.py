@@ -3,8 +3,7 @@ import webview
 import threading
 import time
 
-from UI.schema import App, WebViewWindow
-from UI.boundary import set_device_volume, now_volume
+from UI.boundary import LinuxApp, WinApp, WebViewWindow
 from core_schema import Core
 from default_controll.volume_controll import VolumeController
 
@@ -12,13 +11,14 @@ from default_controll.volume_controll import VolumeController
 # このクラスなどの想定使用方法
 #
 # core, app を引数として渡して使用する
-# core.running でアプリが動作しているか確認できる
-# while(core.running): などで動作を継続する想定
+# core.running：アプリが動作しているか確認
+#   while(core.running): などで動作を継続する想定
+# core.os：OSの種類を取得
 #
-# appはvolume, camera, micのプロパティを持つ
-# volumeはデバイスの音量サイズ、0～100の整数
-# cameraは表情認識、micは音声認識の機能をオンにするか、bool型
-# app.volume = 50 のように代入すればUIも更新される
+# app.volume：デバイスの音量サイズ、0～100の少数
+#   app.volume = 50 のように代入すればUIも更新される
+# app.camera：表情認識の機能をオンにするか、bool型
+# app.mic：音声認識の機能をオンにするか、bool型
 # ===============================================
 
 # メモ：音量を２つ用意する
@@ -31,7 +31,12 @@ def eternal_process(core: Core):
         print(core.running)
         time.sleep(5)
 
-app = App(now_volume)
+if core.os == "Linux":
+    app = LinuxApp()
+elif core.os == "Windows":
+    app = WinApp()
+else:
+    raise NotImplementedError("このOSはサポートされていません。")
 
 window = webview.create_window(
     "My Application",
@@ -43,7 +48,6 @@ window = webview.create_window(
 )
 window = WebViewWindow(window)
 app.create_update_funcs(window.update_ui)
-app.set_device_volume = set_device_volume
 
 volume_controller = VolumeController(app, core)
 core.start_tasks(lambda: eternal_process(core), volume_controller.start_recording)
