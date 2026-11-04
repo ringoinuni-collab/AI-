@@ -5,16 +5,41 @@ import threading
 os = platform.system()
 if os == "Linux":
     import pulsectl
+    def get_device_volume() -> float:
+        with pulsectl.Pulse("python-volume") as pulse:
+            sink = pulse.get_sink_by_name(
+                pulse.server_info().default_sink_name
+            )
+            now_volume = round(sink.volume.value_flat * 100)
+        return now_volume
+
+    def set_device_volume(value: float) -> None:
+        value = max(0, min(100.0, value))
+
+        with pulsectl.Pulse("python-volume") as pulse:
+            sink = pulse.get_sink_by_name(
+                pulse.server_info().default_sink_name
+            )
+            pulse.volume_set_all_chans(sink, value / 100)
+
 elif os == "Windows":
     from pycaw.pycaw import AudioUtilities
+    def get_device_volume() -> float:
+        return round(AudioUtilities.GetSpeakers().volume_percent)
+
+    def set_device_volume(value: float) -> None:
+        value = max(0, min(100.0, value))
+
+        device = AudioUtilities.GetSpeakers()
+        device.volume_percent = value
 else:
     raise NotImplementedError("このOSはサポートされていません。")
 
 class App:
-    def __init__(self, now_volume: float):
+    def __init__(self):
         self.window: WebViewWindow | None = None
-        self._now_volume = now_volume
-        self._volume = now_volume
+        self._now_volume = get_device_volume()
+        self._volume = self._now_volume
         self._camera = False
         self._microphone = False
         self._lock = threading.Lock()
@@ -26,7 +51,9 @@ class App:
         self.update_volume = lambda value: fn("updateVolume", value)
         self.update_camera = lambda value: fn("updateCamera", value)
         self.update_mic = lambda value: fn("updateMic", value)
-    def set_device_volume(self, value: float) -> None: raise NotImplementedError("OSに応じたクラスを呼び出してください。")
+
+    def set_now_volume(self, value: float) -> None:
+        set_device_volume(value)
 
     def get_volume(self) -> float:
         """通信用・現在の音量を取得（0～100）"""
@@ -63,7 +90,7 @@ class App:
     @now_volume.setter
     def now_volume(self, value: int) -> None:
         self._now_volume = value
-        self.set_device_volume(value)
+        self.set_now_volume(value)
 
     @property
     def volume(self) -> float:
@@ -99,35 +126,6 @@ class App:
             self._microphone = value
         self.update_mic(self._microphone)
 
-class WinApp(App):
-    def __init__(self):
-        now_volume = round(AudioUtilities.GetSpeakers().volume_percent)
-        super().__init__(now_volume)
-
-    def set_device_volume(self, value: float) -> None:
-            value = max(0, min(100.0, value))
-
-            device = AudioUtilities.GetSpeakers()
-            device.volume_percent = value
-
-class LinuxApp(App):
-    def __init__(self):
-        with pulsectl.Pulse("python-volume") as pulse:
-            sink = pulse.get_sink_by_name(
-                pulse.server_info().default_sink_name
-            )
-            now_volume = round(sink.volume.value_flat * 100)
-        now_volume = round(AudioUtilities.GetSpeakers().volume_percent)
-        super().__init__(now_volume)
-
-    def set_device_volume(self, value: float) -> None:
-        value = max(0, min(100.0, value))
-
-        with pulsectl.Pulse("python-volume") as pulse:
-            sink = pulse.get_sink_by_name(
-                pulse.server_info().default_sink_name
-            )
-            pulse.volume_set_all_chans(sink, value / 100)
 
 class WebViewWindow:
     def __init__(self, window: webview.Window):
@@ -139,13 +137,7 @@ class WebViewWindow:
 
 
 if __name__ == "__main__":
-    os = platform.system()
-    if os == "Linux":
-        app = LinuxApp()
-    elif os == "Windows":
-        app = WinApp()
-    else:
-        raise NotImplementedError("このOSはサポートされていません。")
+    app = App()
 
     window = webview.create_window(
         "My Application",

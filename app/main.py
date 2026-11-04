@@ -3,7 +3,7 @@ import webview
 import threading
 import time
 
-from UI.boundary import LinuxApp, WinApp, WebViewWindow
+from UI.boundary import App, WebViewWindow
 from core_schema import Core
 from default_controll.volume_controll import VolumeController
 
@@ -31,12 +31,7 @@ def eternal_process(core: Core):
         print(core.running)
         time.sleep(5)
 
-if core.os == "Linux":
-    app = LinuxApp()
-elif core.os == "Windows":
-    app = WinApp()
-else:
-    raise NotImplementedError("このOSはサポートされていません。")
+app = App()
 
 window = webview.create_window(
     "My Application",
@@ -50,7 +45,10 @@ window = WebViewWindow(window)
 app.create_update_funcs(window.update_ui)
 
 volume_controller = VolumeController(app, core)
-core.start_tasks(lambda: eternal_process(core), volume_controller.start_recording)
+core.start_tasks(
+    lambda: eternal_process(core),
+    volume_controller.start_recording,
+)
 
 webview.start()
 
