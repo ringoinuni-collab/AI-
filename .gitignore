@@ -1,0 +1,40 @@
+# Pythonのキャッシュファイル
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 仮想環境
+.venv/
+
+# 環境変数・秘密情報
+.env
+.env.*
+!.env.example
+
+# Pythonのパッケージ関連
+dist/
+build/
+*.egg-info/
+
+# テスト・カバレッジ
+.pytest_cache/
+.coverage
+htmlcov/
+
+# エディタ・IDE
+.vscode/
+.idea/
+
+# OS関連
+.DS_Store
+Thumbs.db
+
+# ログファイル
+*.log
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# 一時ファイル
+*.tmp
+*.bak
