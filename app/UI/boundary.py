@@ -45,10 +45,12 @@ class App:
         self._lock = threading.Lock()
 
     def update_volume(self, value: float) -> None: pass
+    def update_adj(self, value: bool) -> None: pass
     def update_camera(self, value: bool) -> None: pass
     def update_mic(self, value: bool) -> None: pass
     def create_update_funcs(self, fn: callable) -> None:
         self.update_volume = lambda value: fn("updateVolume", value)
+        self.update_adj = lambda value: fn("updateAdj", value)
         self.update_camera = lambda value: fn("updateCamera", value)
         self.update_mic = lambda value: fn("updateMic", value)
 
@@ -67,6 +69,12 @@ class App:
         with self._lock:
             self._volume = value
         self.update_volume(round(value, 2))
+
+    def toggle_adj(self) -> None:
+        """自動音量調整のオン/オフを切り替え"""
+        with self._lock:
+            self._camera = not self._camera
+        self.update_adj(self._camera)
 
     def toggle_cam(self) -> None:
         """カメラのオン/オフを切り替え"""
@@ -99,6 +107,19 @@ class App:
     @volume.setter
     def volume(self, value: int) -> None:
         self.set_volume(value)
+
+    @property
+    def adj(self) -> bool:
+        """(bool)自動音量調整機能を使用するか"""
+        with self._lock:
+            return self._camera
+    @adj.setter
+    def adj(self, value: bool) -> None:
+        if value not in [True, False]:
+            raise ValueError("音量調整有無はboolで指定してください。")
+        with self._lock:
+            self._camera = value
+        self.update_camera(self._camera)
 
     @property
     def camera(self) -> bool:

@@ -27,6 +27,9 @@
         function setVolume(value) {
             window.pywebview.api.set_volume(Number(value));
         }
+        function toggleAdj() {
+            window.pywebview.api.toggle_adj();
+        }
         function toggleMic() {
             window.pywebview.api.toggle_mic();
         }
@@ -36,6 +39,10 @@
 
         function updateVolume(value) {
             document.getElementById("volumeSlider").value = value;
+        }
+        function updateAdj(value) {
+            const adjButton = document.getElementById("adjButton").children[0];
+            adjButton.src = value ? "img/adjustments.png" : "img/adjustments-off.png";
         }
         function updateMic(value) {
             const micButton = document.getElementById("micButton").children[0];
@@ -57,6 +64,7 @@
         <input id="volumeSlider" type="range" min="0" max="100" step="0.01" onInput="setVolume(this.value)" class="slider w-100">
     </div>
     <div class="flex justify-center gap-10">
+        <button id="adjButton" onClick="toggleAdj()" class=""><img src="img/adjustments-off.png" alt="カメラ" width="32" height="32"></button>
         <button id="micButton" onClick="toggleMic()" class=""><img src="img/microphone-off.png" alt="マイク" width="32" height="32"></button>
         <button id="cameraButton" onClick="toggleCam()" class=""><img src="img/camera-off.png" alt="カメラ" width="32" height="32"></button>
     </div>

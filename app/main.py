@@ -24,13 +24,6 @@ from default_controll.volume_controll import VolumeController
 # メモ：音量を２つ用意する
 core = Core()
 
-
-def eternal_process(core: Core):
-    """テスト用の永続的な処理"""
-    while core.running:
-        print(core.running)
-        time.sleep(5)
-
 app = App()
 
 window = webview.create_window(
@@ -46,7 +39,6 @@ app.create_update_funcs(window.update_ui)
 
 volume_controller = VolumeController(app, core)
 core.start_tasks(
-    lambda: eternal_process(core),
     volume_controller.start_recording,
 )
 
