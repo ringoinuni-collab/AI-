@@ -35,13 +35,15 @@ class VolumeController:
             ) as recorder:
 
                 while self.core.running:
+                    self.app.adj.wait()
+
                     # 0.1秒分の音声を取得して音量を変更
                     data = recorder.record(numframes=4800)
                     self.app.now_volume = self.adjust_volume(data)
         finally:
             pythoncom.CoUninitialize()
 
-    def adjust_volume(self, data, smoothness=0.9, stability=0.7) -> float:
+    def adjust_volume(self, data, smoothness=0.99, stability=0.5) -> float:
         """変更後の音量を決定する関数"""
         # RMS値を計算
         rms = np.sqrt(np.mean(data ** 2))
@@ -56,6 +58,6 @@ class VolumeController:
 
         # ゲインを適用して音量を調整
         new_volume = stability * self.app.now_volume + (1 - stability) * (self.app.volume * gain)
-        if abs(new_volume - self.app.now_volume) < 0.02:
+        if abs(new_volume - self.app.now_volume) < 0.2:
             return self.app.now_volume
         return max(0, min(100, new_volume))
