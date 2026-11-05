@@ -1,0 +1,6 @@
+必要なモノ
+
+vsコードで使ってるからこれをダウンロードしないといけないかも顔カメラ
+
+python -m pip install --upgrade pip
+python -m pip install mediapipe opencv-python numpy
