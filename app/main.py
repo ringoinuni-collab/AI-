@@ -17,8 +17,12 @@ from default_controll.volume_controll import VolumeController
 #
 # app.volume：デバイスの音量サイズ、0～100の少数
 #   app.volume = 50 のように代入すればUIも更新される
-# app.camera：表情認識の機能をオンにするか、bool型
-# app.mic：音声認識の機能をオンにするか、bool型
+# app.cam、app.mic、app.adj：
+#   camが顔認証、micが音声認識、adjが音量自動調整のオンオフを管理
+#   app.camera.on() でオン、app.camera.off() でオフにできる
+#     (cameraの部分は各機能の名前に変更)
+#   app.camera.is_on でオンかオフかを取得できる
+#   app.camera.wait() でオンになるまで待機できる
 # ===============================================
 
 # メモ：音量を２つ用意する

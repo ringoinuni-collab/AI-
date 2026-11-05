@@ -35,24 +35,50 @@ elif os == "Windows":
 else:
     raise NotImplementedError("このOSはサポートされていません。")
 
+class ThreadEvent:
+    def __init__(self, name: str = "ThreadEvent"):
+        self._event = threading.Event()
+        self._name = name
+
+    def on(self):
+        f"""{self._name}をオンに"""
+        self._event.set()
+        self.update(self.is_on)
+
+    def off(self):
+        f"""{self._name}をオフに"""
+        self._event.clear()
+        self.update(self.is_on)
+
+    @property
+    def is_on(self) -> bool:
+        f"""{self._name}がオンかを取得"""
+        return self._event.is_set()
+
+    def wait(self, timeout=None) -> bool:
+        f"""{self._name}がオンになるまで待機"""
+        return self._event.wait(timeout)
+
+    def update(self, value: float) -> None:
+        f"""UIに{self._name}を更新する関数"""
+        pass
+
 class App:
     def __init__(self):
         self.window: WebViewWindow | None = None
         self._now_volume = get_device_volume()
         self._volume = self._now_volume
-        self._camera = False
-        self._microphone = False
+        self.adj = ThreadEvent("音量自動調整")
+        self.cam = ThreadEvent("カメラ")
+        self.mic = ThreadEvent("マイク")
         self._lock = threading.Lock()
 
     def update_volume(self, value: float) -> None: pass
-    def update_adj(self, value: bool) -> None: pass
-    def update_camera(self, value: bool) -> None: pass
-    def update_mic(self, value: bool) -> None: pass
     def create_update_funcs(self, fn: callable) -> None:
         self.update_volume = lambda value: fn("updateVolume", value)
-        self.update_adj = lambda value: fn("updateAdj", value)
-        self.update_camera = lambda value: fn("updateCamera", value)
-        self.update_mic = lambda value: fn("updateMic", value)
+        self.adj.update = lambda value: fn("updateAdj", value)
+        self.cam.update = lambda value: fn("updateCamera", value)
+        self.mic.update = lambda value: fn("updateMic", value)
 
     def set_now_volume(self, value: float) -> None:
         set_device_volume(value)
@@ -73,20 +99,26 @@ class App:
     def toggle_adj(self) -> None:
         """自動音量調整のオン/オフを切り替え"""
         with self._lock:
-            self._camera = not self._camera
-        self.update_adj(self._camera)
+            if self.adj.is_on:
+                self.adj.off()
+            else:
+                self.adj.on()
 
     def toggle_cam(self) -> None:
         """カメラのオン/オフを切り替え"""
         with self._lock:
-            self._camera = not self._camera
-        self.update_camera(self._camera)
+            if self.cam.is_on:
+                self.cam.off()
+            else:
+                self.cam.on()
 
     def toggle_mic(self) -> None:
         """マイクのオン/オフを切り替え"""
         with self._lock:
-            self._microphone = not self._microphone
-        self.update_mic(self._microphone)
+            if self.mic.is_on:
+                self.mic.off()
+            else:
+                self.mic.on()
 
     @property
     def now_volume(self) -> float:
@@ -108,44 +140,10 @@ class App:
     def volume(self, value: int) -> None:
         self.set_volume(value)
 
-    @property
-    def adj(self) -> bool:
-        """(bool)自動音量調整機能を使用するか"""
+    def adj_pause(self) -> bool:
+        """(bool)自動音量調整機能がオンになるまで待機"""
         with self._lock:
-            return self._camera
-    @adj.setter
-    def adj(self, value: bool) -> None:
-        if value not in [True, False]:
-            raise ValueError("音量調整有無はboolで指定してください。")
-        with self._lock:
-            self._camera = value
-        self.update_camera(self._camera)
-
-    @property
-    def camera(self) -> bool:
-        """(bool)表情認識機能を使用するか"""
-        with self._lock:
-            return self._camera
-    @camera.setter
-    def camera(self, value: bool) -> None:
-        if value not in [True, False]:
-            raise ValueError("カメラの状態はboolで指定してください。")
-        with self._lock:
-            self._camera = value
-        self.update_camera(self._camera)
-
-    @property
-    def mic(self) -> bool:
-        """(bool)音声認識機能を使用するか"""
-        with self._lock:
-            return self._microphone
-    @mic.setter
-    def mic(self, value: bool) -> None:
-        if value not in [True, False]:
-            raise ValueError("マイクの状態はboolで指定してください。")
-        with self._lock:
-            self._microphone = value
-        self.update_mic(self._microphone)
+            return self.adj
 
 
 class WebViewWindow:
