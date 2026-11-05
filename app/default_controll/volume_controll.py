@@ -12,6 +12,7 @@ class VolumeController:
     """
     def __init__(self, app: App, core: Core, target_rms=0.1):
         self.target_rms = target_rms
+        self.smoothed_rms = target_rms
         self.app = app
         self.core = core
 
@@ -40,16 +41,21 @@ class VolumeController:
         finally:
             pythoncom.CoUninitialize()
 
-    def adjust_volume(self, data, alpha=0.3):
+    def adjust_volume(self, data, smoothness=0.9, stability=0.7) -> float:
         """変更後の音量を決定する関数"""
         # RMS値を計算
         rms = np.sqrt(np.mean(data ** 2))
         if rms < 1e-6:
             return self.app.volume
 
+        self.smoothed_rms = smoothness * self.smoothed_rms + (1 - smoothness) * rms
+
         # RMS値を基にゲインを求める
-        gain = self.target_rms / rms
+        gain = self.target_rms / self.smoothed_rms
         gain = max(0.25, min(4, gain))
 
         # ゲインを適用して音量を調整
-        return alpha * self.app.now_volume + (1 - alpha) * (self.app.volume * gain)
+        new_volume = stability * self.app.now_volume + (1 - stability) * (self.app.volume * gain)
+        if abs(new_volume - self.app.now_volume) < 0.02:
+            return self.app.now_volume
+        return max(0, min(100, new_volume))
