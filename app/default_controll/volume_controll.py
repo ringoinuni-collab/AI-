@@ -2,7 +2,7 @@ import soundcard as sc
 import numpy as np
 import pythoncom
 
-from UI.boundary import App
+from app.UI.boundary import App
 from core_schema import Core
 
 class VolumeController:
