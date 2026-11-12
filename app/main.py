@@ -5,7 +5,7 @@ import time
 
 from UI.boundary import App, WebViewWindow
 from core_schema import Core
-from default_controll.volume_controll import VolumeController
+from default_control.volume_control import VolumeController
 from talk_control.recognition import VoiceRecognition
 
 # ===============================================
