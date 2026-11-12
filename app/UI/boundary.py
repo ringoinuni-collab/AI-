@@ -55,10 +55,6 @@ class ThreadEvent:
         f"""{self._name}がオンかを取得"""
         return self._event.is_set()
 
-    def wait(self, timeout=None) -> bool:
-        f"""{self._name}がオンになるまで待機"""
-        return self._event.wait(timeout)
-
     def update(self, value: float) -> None:
         f"""UIに{self._name}を更新する関数"""
         pass

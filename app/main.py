@@ -6,6 +6,7 @@ import time
 from UI.boundary import App, WebViewWindow
 from core_schema import Core
 from default_controll.volume_controll import VolumeController
+from talk_control.recognition import VoiceRecognition
 
 # ===============================================
 # このクラスなどの想定使用方法
@@ -22,7 +23,10 @@ from default_controll.volume_controll import VolumeController
 #   app.cam.on() でオン、app.cam.off() でオフにできる
 #     (cameraの部分は各機能の名前に変更)
 #   app.cam.is_on でオンかオフかを取得できる
-#   app.cam.wait() でオンになるまで待機できる
+#   app.cam.wait() でオンになるまで待機できたが削除した
+#     while self.app.mic.is_on and self.core.running:
+#         sleep(0.1)
+#     などで待機するように
 # ===============================================
 
 # メモ：音量を２つ用意する
@@ -45,6 +49,9 @@ volume_controller = VolumeController(app, core)
 core.start_tasks(
     volume_controller.start_recording,
 )
+
+recognizer = VoiceRecognition(core, app)
+core.start_tasks(recognizer.main)
 
 webview.start()
 

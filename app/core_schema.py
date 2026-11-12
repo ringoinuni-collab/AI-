@@ -19,7 +19,8 @@ class Core:
             thread = threading.Thread(
                 target=task,
                 args=(),
-                daemon=False
+                daemon=False,
+                name=task.__name__
             )
             thread.start()
             self._threads.append(thread)
@@ -34,6 +35,8 @@ class Core:
         """バックグラウンド処理の終了を待つ"""
         for thread in self._threads:
             thread.join()
+
+        self._threads.clear()
 
     @property
     def running(self) -> bool:

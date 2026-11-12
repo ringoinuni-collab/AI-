@@ -1,6 +1,7 @@
 import soundcard as sc
 import numpy as np
 import pythoncom
+from time import sleep
 
 from UI.boundary import App
 from core_schema import Core
@@ -35,7 +36,8 @@ class VolumeController:
             ) as recorder:
 
                 while self.core.running:
-                    self.app.adj.wait()
+                    while self.app.mic.is_on and self.core.running:
+                        sleep(0.1)
 
                     # 0.1秒分の音声を取得して音量を変更
                     data = recorder.record(numframes=4800)
