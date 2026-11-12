@@ -3,9 +3,9 @@ import webview
 import threading
 import time
 
-from UI.boundary import App, WebViewWindow
+from app.UI.boundary import App, WebViewWindow
 from core_schema import Core
-from default_controll.volume_controll import VolumeController
+from app.UI.default_controll.volume_controll import VolumeController
 
 # ===============================================
 # このクラスなどの想定使用方法
