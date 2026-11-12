@@ -11,7 +11,7 @@ import webview
 from core_schema import Core
 from app.UI.boundary import App, WebViewWindow
 
-from app.default_controll.volume_controll import (
+from app.UI.default_controll.volume_controll import (
     VolumeController,
 )
 
