@@ -1,0 +1,4 @@
+pywebview-6.2.1
+comtypes-1.4.17
+pycaw-20260927
+pulsectl-24.12.0
