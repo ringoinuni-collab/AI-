@@ -9,9 +9,9 @@ from pathlib import Path
 import webview
 
 from core_schema import Core
-from UI.boundary import App, WebViewWindow
+from app.UI.boundary import App, WebViewWindow
 
-from default_controll.volume_controll import (
+from app.default_controll.volume_controll import (
     VolumeController,
 )
 
